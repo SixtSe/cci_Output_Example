@@ -205,7 +205,7 @@ void VTC_setNewVT(const ISOVT_EVENT_DATA_T* psEvData)
 void VTC_setPoolReady(const ISOVT_EVENT_DATA_T* psEvData)
 {
 
-	// beim nächsten Anstecken des Gerätes muss der letzte gespeicherte Wert auf das Display gesendet werden.
+	// beim nï¿½chsten Anstecken des Gerï¿½tes muss der letzte gespeicherte Wert auf das Display gesendet werden.
 
 }
 
@@ -250,7 +250,7 @@ void init_GPIO(void)
 
 static int I1 = 0;
 static int I2 = 0;
-CYCLE_4_TAP CYCLE_4A;
+CYCLE_8_TAP CYCLE_8A;
 
 /* ************************************************************************ */
 void AppVTClientDoProcess(const ISOVT_EVENT_DATA_T* psEvData)
@@ -268,17 +268,18 @@ void AppVTClientDoProcess(const ISOVT_EVENT_DATA_T* psEvData)
 	I1 = !gpio_get_level(BUTTON_I1);
 	I2 = !gpio_get_level(BUTTON_I2);
 
-	CYCLE_4A(I1);
-	if (CYCLE_4A.Q0) IsoVtcCmd_CtrlAudioSignal(psEvData->u8Instance, 1, 700,  500, 0);
-	if (CYCLE_4A.Q1) IsoVtcCmd_CtrlAudioSignal(psEvData->u8Instance, 1, 940, 1000, 0);
-	if (CYCLE_4A.Q2) IsoVtcCmd_CtrlAudioSignal(psEvData->u8Instance, 1, 1030, 500, 0);
-
-
-
+	CYCLE_8A(I1);
+	if (CYCLE_8A.Q0) IsoVtcCmd_CtrlAudioSignal(psEvData->u8Instance, 1, 20000,  500, 2);
+	if (CYCLE_8A.Q1) IsoVtcCmd_CtrlAudioSignal(psEvData->u8Instance, 1, 940, 1000, 0);
+	if (CYCLE_8A.Q2) IsoVtcCmd_CtrlAudioSignal(psEvData->u8Instance, 1, 1030, 1500, 3);
+	if (CYCLE_8A.Q3) IsoVtcCmd_CtrlAudioSignal(psEvData->u8Instance, 1, 700,  500, 0);
+	if (CYCLE_8A.Q4) IsoVtcCmd_CtrlAudioSignal(psEvData->u8Instance, 1, 2940, 1000, 200);
+	if (CYCLE_8A.Q5) IsoVtcCmd_CtrlAudioSignal(psEvData->u8Instance, 1, 1030, 2500, 0);
+	if (CYCLE_8A.Q6) IsoVtcCmd_CtrlAudioSignal(psEvData->u8Instance, 1, 1700,  1500, 0);
 
 }
 
-
+RS RS1;
 void VTC_handleSoftkeysAndButton_Q1(const struct ButtonActivation_S *pButtonData) {
 
 	switch (pButtonData->keyActivationCode) {
@@ -286,17 +287,18 @@ void VTC_handleSoftkeysAndButton_Q1(const struct ButtonActivation_S *pButtonData
 
 	case BUTTON_STATE_PRESSED:
 	case BUTTON_STATE_HELD:
-		gpio_set_level(GPIO_Q1, 1);
+		RS1(true, false);
 		break;
 
 
 	case BUTTON_STATE_RELEASED:
 	case BUTTON_STATE_ABORTED:
-		gpio_set_level(GPIO_Q1, 0);
+		RS1(false, true);
 		break;
 
 
 	}
+	gpio_set_level(GPIO_Q1, RS1.Q1);
 }
 
 void VTC_handleSoftkeysAndButton_Q2(const struct ButtonActivation_S *pButtonData) {
